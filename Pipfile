@@ -11,6 +11,7 @@ langchain-core = "*"
 dotenv = "*"
 langchain-ollama = "*"
 langchain-google-genai = "*"
+langchain-tavily = "*"
 
 [dev-packages]
 
