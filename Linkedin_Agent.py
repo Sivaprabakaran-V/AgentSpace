@@ -1,4 +1,3 @@
-from re import search
 from dotenv import load_dotenv
 from langchain.prompts.prompt import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -12,11 +11,13 @@ load_dotenv()
 def linkedin(name: str) -> str:
     linkedin_username = linkedin_lookup_agent(name=name)
     linkedin_data = scrape_linkedin_profile(linkedin_url=linkedin_username)    
+    return linkedin_data   # ✅ return the scraped data
+
 
 summary_template = """
-given the Linkedin information {information} about a person I want you to create:
+Given the Linkedin information {information} about a person, I want you to create:
 1. A short summary
-2. two interesting facts about them
+2. Two interesting facts about them
 """
 summary_prompt_template = PromptTemplate(
     input_variables=["information"], template=summary_template
@@ -28,15 +29,13 @@ llm = ChatGoogleGenerativeAI(
         temperature=0
     )
 
-chain = summary_prompt_template | llm
-
-res = chain.invoke(input={"information": linkedin_data})
-
-print(res)
-
+# ✅ Added the parser into the chain
+parser = StrOutputParser()
+chain = summary_prompt_template | llm | parser
 
 if __name__ == "__main__":
-    load_dotenv()
+    print("Linkedin Agent starting...")
 
-    print("Linkedin Agenet enter")
-    linkedin(name="Allie Miller")
+    linkedin_data = linkedin(name="Allie Miller")  # ✅ call the function and get data
+    res = chain.invoke(input={"information": linkedin_data})
+    print(res)
